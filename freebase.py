@@ -5,10 +5,7 @@ api_key = open(".freebase_api_key").read()
 service_url = 'https://www.googleapis.com/freebase/v1/mqlread'
 def get_types(name):
     query = [{'name': name, 'type': []}]
-# print(json.dumps(query))
-    params = {'query': json.dumps(query), 'key': api_key}
-    url = service_url + '?' + urllib.parse.urlencode(params)
-    response = json.loads(urllib.request.urlopen(url).read().decode('utf-8'))
+    response = make_query(query)
     s = set()
     for l in response['result']:
         for topic in l['type']:
@@ -32,11 +29,14 @@ def get_athlete_info(name):
                 "sport": None
               }]
             }]
-    response = make_query(query)
+    return make_query(query)
 
 def make_query(query):
     params = {'query': json.dumps(query), 'key': api_key}
     url = service_url + '?' + urllib.parse.urlencode(params)
     return json.loads(urllib.request.urlopen(url).read().decode('utf-8'))
 
-print(get_athlete_info('chris wondolowski'))
+def get_common_types(name1, name2):
+    return intersect_types(get_types(name1), get_types(name2))
+
+# print(get_athlete_info('colin kaepernick'))
